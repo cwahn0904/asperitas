@@ -78,7 +78,7 @@
                 }
             ));
 
-        var intensity_name = document.getElementById('intensity_name');
+            var intensity_name = document.getElementById('intensity_name');
 
             if (e.value == 'zero-g') {
                 intensity_name.innerHTML = "Zero G";
@@ -99,7 +99,7 @@
                 output.innerHTML = slider.value;
                 current_preamble = 'vfw';
 
-            } else if (e.value == 'p_isotonic') {
+            } else if (e.value == 'p-isotonic') {
                 intensity_name.innerHTML = "Psuedo-Isotonic Intensity Setting";
                 slider.style.display = 'inline-block';
                 slider.min = 1;
@@ -109,7 +109,7 @@
                 output.innerHTML = slider.value;
                 current_preamble = 'pit';
 
-            } else if (e.value == 'p_isokinetic') {
+            } else if (e.value == 'p-isokinetic') {
                 intensity_name.innerHTML = "Psuedo-Isokinetic Intensity Setting";
                 slider.style.display = 'inline-block';
                 slider.min = 1;
