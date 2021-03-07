@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAPiiS OTA controller demo</title>
+</head>
+
+<body>
+    <div id="header">
+        <h1>OTA Controller Demo</h1>
+    </div>
+    <div id="content">
+        <div>
+            <div>
+                <h2>Control Mode Selection</h2>
+                <div>
+                    <input type='checkbox' name='control-mode' value='zero-g' onclick='checkOnlyOne(this)'
+                        checked /> Zero G
+                    <br />
+                    <input type='checkbox' name='control-mode' value='virtual-free-weight' onclick='checkOnlyOne(this)' />
+                    Virtual Free Weight
+                    <br />
+                    <input type='checkbox' name='control-mode' value='p-isotonic' onclick='checkOnlyOne(this)' />
+                    Pseudo-isotonic
+                    <br />
+                    <input type='checkbox' name='control-mode' value='p-isokinetic' onclick='checkOnlyOne(this)' />
+                    Pseudo-isokinetic
+                </div>
+            </div>
+            <div>
+                <h2 id="intensity_name">Virtual Free Weight Setting</h2>
+                <div id="current-intensity" style="display: none;">
+                    25
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="50" value="25" class="slider" id="intensity" style="display: none;">
+                </div>
+            </div>
+
+            <div>
+                <h2>Recieved Data From ASYNC Server</h2>
+                <div id="recieved-data">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="footer">
+        Made by Ahn, Chan-Woo
+    </div>
+
+
+    <!-- JS -->
+
+
+    <script>
+        var current_preamble = 'zeg';
+
+        function checkOnlyOne(e) {
+
+            const checkboxes
+                = document.getElementsByName("control-mode");
+
+            checkboxes.forEach((cb) => {
+                cb.checked = false;
+            })
+
+            e.checked = true;
+
+            contSocket.send(JSON.stringify(
+                {
+                    'preamble': 'ctm',
+                    'value': e.value,
+                }
+            ));
+
+        var intensity_name = document.getElementById('intensity_name');
+
+            if (e.value == 'zero-g') {
+                intensity_name.innerHTML = "Zero G";
+                slider.style.display = 'none';
+                slider.min = 1;
+                slider.max = 50;
+                slider.value = 25;
+                output.style.display = 'none';
+                current_preamble = 'zeg';
+
+            } else if (e.value == 'virtual-free-weight') {
+                intensity_name.innerHTML = "Virtual Free Weight Setting";
+                slider.style.display = 'inline-block';
+                slider.min = 1;
+                slider.max = 50;
+                slider.value = 25;
+                output.style.display = 'block';
+                output.innerHTML = slider.value;
+                current_preamble = 'vfw';
+
+            } else if (e.value == 'p_isotonic') {
+                intensity_name.innerHTML = "Psuedo-Isotonic Intensity Setting";
+                slider.style.display = 'inline-block';
+                slider.min = 1;
+                slider.max = 500;
+                slider.value = 250;
+                output.style.display = 'block';
+                output.innerHTML = slider.value;
+                current_preamble = 'pit';
+
+            } else if (e.value == 'p_isokinetic') {
+                intensity_name.innerHTML = "Psuedo-Isokinetic Intensity Setting";
+                slider.style.display = 'inline-block';
+                slider.min = 1;
+                slider.max = 5;
+                slider.value = 2;
+                output.style.display = 'block';
+                output.innerHTML = slider.value;
+                current_preamble = 'pik';
+            }
+        }
+
+        var contSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/ota/'
+        );
+
+        contSocket.onopen = function (e) {
+
+        };
+
+        contSocket.onclose = function (e) {
+            console.error('ContSocket closed unexpectedly.')
+        };
+
+        contSocket.onmessage = function (e) {
+            var data = JSON.parse(e.data);
+            var preamble = data['preamble'];
+            var value = data['value'];
+
+            document.getElementById('recieved-data').innerHTML = preamble + " " + value;
+
+        };
+
+        var slider = document.getElementById("intensity");
+        var output = document.getElementById("current-intensity");
+        output.innerHTML = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function (e) {
+            contSocket.send(JSON.stringify(
+                {
+                    'preamble': current_preamble,
+                    'value': slider.value,
+                }
+            ))
+            output.innerHTML = this.value;
+        }
+    </script>
+
+
+</body>
+
+</html>
