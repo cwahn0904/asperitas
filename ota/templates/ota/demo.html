@@ -1,4 +1,4 @@
-{% extends 'ota/master.html' %} 
+{% extends 'ota/master.html' %}
 
 {% block title %}LAPiiS OTA Controller Demo - Controller{% endblock %}
 
@@ -7,8 +7,7 @@
     <div>
         <h2>Control Mode Selection</h2>
         <div>
-            <input type='checkbox' name='control-mode' value='zero-g' onclick='checkOnlyOne(this)'
-                checked /> Zero G
+            <input type='checkbox' name='control-mode' value='zero-g' onclick='checkOnlyOne(this)' checked /> Zero G
             <br />
             <input type='checkbox' name='control-mode' value='virtual-free-weight' onclick='checkOnlyOne(this)' />
             Virtual Free Weight
@@ -31,6 +30,19 @@
     </div>
 
     <div>
+        <h2>Servo On</h2>
+        <input type="checkbox" name="servo-on" value="servo-on" checked onclick="servoOn(this)">
+    </div>
+
+    <div>
+        <h2>VFW PID GAIN Tuner</h2>
+        P I D <br>
+        <input type="text" name="KP" id="KP" value=175>
+        <input type="text" name="KI" id="KI" value=0>
+        <input type="text" name="KD" id="KD" value=0>
+        <button name="gain-update" id="gain-update" onclick="vfwGainUpdate(this)">Update</button>
+    </div>
+    <div>
         <h2>Recieved Data From ASYNC Server</h2>
         <div id="recieved-data">
 
@@ -39,6 +51,9 @@
 
 </div>
 {% endblock %}
+
+
+
 
 {% block script %}
 <script>
@@ -134,43 +149,43 @@
     slider.oninput = function (e) {
         contSocket.send(JSON.stringify(
             {
-                'preamble': current_preamble,
+                'preamble': "int",
                 'value': slider.value,
             }
         ))
         output.innerHTML = this.value;
     }
+
+    function servoOn(e) {
+        if (e.checked == false) {
+            contSocket.send(JSON.stringify(
+                {
+                    'preamble': 'svo',
+                    'value': '0',
+                }
+            ));
+        } else if (e.checked == true) {
+            contSocket.send(JSON.stringify(
+                {
+                    'preamble': 'svo',
+                    'value': '1',
+                }
+            ));
+        }
+    };
+
+    function vfwGainUpdate(e) {
+        var kp = document.getElementById("KP").value;
+        var ki = document.getElementById("KI").value;
+        var kd = document.getElementById("KD").value;
+
+        contSocket.send(JSON.stringify(
+            {
+                'preamble': 'vfg',
+                'value': kp + "," + ki + "," + kd
+            }
+        ));
+    };
+
 </script>
 {% endblock %}
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAPiiS OTA controller demo</title>
-</head>
-
-<body>
-    <div id="header">
-        <h1>OTA Controller Demo</h1>
-    </div>
-    <div id="content">
-
-    </div>
-    <div id="footer">
-        Made by Ahn, Chan-Woo
-    </div>
-
-
-    <!-- JS -->
-
-
-
-
-
-</body>
-
-</html> -->
