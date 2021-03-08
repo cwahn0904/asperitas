@@ -111,9 +111,9 @@
         } else if (e.value == 'p-isokinetic') {
             intensity_name.innerHTML = "Psuedo-Isokinetic Intensity Setting";
             slider.style.display = 'inline-block';
-            slider.min = 1;
-            slider.max = 50;
-            slider.value = 25;
+            slider.min = 200;
+            slider.max = 700;
+            slider.value = 450;
             output.style.display = 'block';
             output.innerHTML = slider.value;
             current_preamble = 'pik';
